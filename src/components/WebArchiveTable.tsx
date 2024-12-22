@@ -19,15 +19,18 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { fetchArchivedPageData } from "@/app/actions/fetchWebArchieveAction";
+import toast from "react-hot-toast";
 
 interface WebArchiveTableProps {
   rawData: WebArchiveData;
   groupedData: GroupedWebArchiveData;
+  wpUrl: string;
 }
 
 export function WebArchiveTable({
   rawData,
   groupedData,
+  wpUrl,
 }: WebArchiveTableProps) {
   const [isModalOpen, setIsModalOpen] = useState(false); // Controls the modal visibility
   const [headers] = rawData;
@@ -39,17 +42,11 @@ export function WebArchiveTable({
     isCreatePost: boolean
   ) {
     setIsModalOpen(true); // Open the modal
-    try {
-      // Simulate an API call
-      await fetchArchivedPageData(original, endtimestamp, isCreatePost).then(
-        () => window.alert("Data cloned successfully!")
-      );
-    } catch (error) {
-      console.error("Error cloning data:", error);
-      alert("Failed to clone data. Please try again.");
-    } finally {
-      setIsModalOpen(false); // Close the modal
-    }
+    // Simulate an API call
+    await fetchArchivedPageData(original, endtimestamp, isCreatePost, wpUrl)
+      .then(() => toast.success("Data cloned successfully!"))
+      .catch((e) => toast.error(e))
+      .finally(() => setIsModalOpen(false));
   }
 
   return (

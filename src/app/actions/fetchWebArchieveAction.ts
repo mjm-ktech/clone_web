@@ -24,7 +24,8 @@ export async function fetchWebArchiveAction(
 export async function fetchArchivedPageData(
   origin: string,
   endtimestamp: string,
-  isCreatePost: boolean
+  isCreatePost: boolean,
+  wpUrl: string
 ): Promise<string> {
   try {
     // Construct the archive URL dynamically
@@ -72,6 +73,7 @@ export async function fetchArchivedPageData(
       formattedText,
       wrapperContent,
       isCreatePost,
+      wpUrl,
       categories
     );
 

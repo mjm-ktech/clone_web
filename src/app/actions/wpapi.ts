@@ -5,16 +5,25 @@ export async function createWordpress(
   title: string,
   htmlContent: string,
   isCreatePost: boolean,
+  wpUrl: string,
   categories?: string[]
 ) {
-  const loginUrl =
-    "https://crawl-demo.k-tech-services.com/wp-json/jwt-auth/v1/token";
-  const pageEndPoint =
-    "https://crawl-demo.k-tech-services.com/wp-json/wp/v2/pages";
-  const postEndPoint =
-    "https://crawl-demo.k-tech-services.com/wp-json/wp/v2/posts";
-  const categoryEndPoint =
-    "https://crawl-demo.k-tech-services.com/wp-json/wp/v2/categories";
+  if (!wpUrl) {
+    throw new Error("Vui lòng nhập URL trên trang web");
+  }
+
+  // Kiểm tra cấu trúc URL
+  const wpUrlPattern = /^https?:\/\/[^/]+\/wp-json$/;
+  if (!wpUrlPattern.test(wpUrl)) {
+    throw new Error(
+      "URL không hợp lệ. Vui lòng nhập URL có dạng https://your-url.com/wp-json"
+    );
+  }
+
+  const loginUrl = `${wpUrl}/jwt-auth/v1/token`;
+  const pageEndPoint = `${wpUrl}/wp/v2/pages`;
+  const postEndPoint = `${wpUrl}/wp/v2/posts`;
+  const categoryEndPoint = `${wpUrl}/wp/v2/categories`;
 
   const endpoint = isCreatePost ? postEndPoint : pageEndPoint;
 
@@ -59,6 +68,7 @@ export async function createWordpress(
         }
       } catch (error) {
         console.error(`Lỗi xử lý danh mục "${categoryName}":`, error);
+        throw new Error(`Lỗi xử lý danh mục "${categoryName}"`);
       }
     }
   }
@@ -88,5 +98,6 @@ export async function createWordpress(
     console.log("Bài viết được tạo thành công:");
   } catch (error) {
     console.error("Lỗi khi tạo bài viết:", error);
+    throw new Error("Lỗi khi tạo bài viết");
   }
 }
