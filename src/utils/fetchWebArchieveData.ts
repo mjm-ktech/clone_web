@@ -10,7 +10,7 @@ export async function fetchWebArchiveData(
 ): Promise<WebArchiveData> {
   const apiUrl = `https://web.archive.org/web/timemap/json?url=${encodeURIComponent(
     url
-  )}&matchType=prefix&collapse=urlkey&output=json&fl=original,mimetype,timestamp,endtimestamp,groupcount,uniqcount&filter=!statuscode:[45]..&limit=10000&_=${Date.now()}`;
+  )}&matchType=prefix&collapse=urlkey&output=json&fl=original,mimetype,timestamp,endtimestamp&filter=!statuscode:[45]..&limit=10000&_=${Date.now()}`;
 
   const response = await fetch(apiUrl);
   if (!response.ok) {
@@ -23,9 +23,20 @@ export async function fetchWebArchiveData(
 export function groupDataByYear(data: WebArchiveData): GroupedWebArchiveData {
   const [headers, ...entries] = data;
   const endTimestampIndex = headers.indexOf("endtimestamp");
+  const originalIndex = headers.indexOf("original");
 
-  return entries.reduce((acc: GroupedWebArchiveData, entry) => {
+  // Regular expression to match URLs with date paths
+  const datePathRegex = /\/\d{4}\/\d{2}\/\d{2}\//;
+
+  // Filter entries that match the date path pattern in the "original" column
+  const filteredEntries = entries.filter((entry) =>
+    datePathRegex.test(entry[originalIndex])
+  );
+
+  // Group filtered entries by year
+  return filteredEntries.reduce((acc: GroupedWebArchiveData, entry) => {
     const year = entry[endTimestampIndex].substring(0, 4);
+
     if (!acc[year]) {
       acc[year] = [];
     }
