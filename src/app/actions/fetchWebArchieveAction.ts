@@ -51,8 +51,12 @@ export async function fetchArchivedPageData(
 
     console.log("Extracted content:", wrapperContent);
 
+    const slug: string  = origin.split('/').filter(Boolean).pop() ?? "";
+
+    // Replace hyphens (-) with spaces
+    const formattedText = slug.replace(/-/g, " ");
     // Optionally post to WordPress
-    await createPost(archiveUrl, wrapperContent);
+    await createPost(formattedText, wrapperContent);
 
     return wrapperContent;
   } catch (error) {
