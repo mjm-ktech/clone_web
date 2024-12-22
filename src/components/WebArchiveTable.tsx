@@ -33,12 +33,16 @@ export function WebArchiveTable({
   const [headers] = rawData;
   const years = Object.keys(groupedData).sort().reverse();
 
-  async function handleCloneData(original: string, endtimestamp: string) {
+  async function handleCloneData(
+    original: string,
+    endtimestamp: string,
+    isCreatePost: boolean
+  ) {
     setIsModalOpen(true); // Open the modal
     try {
       // Simulate an API call
-      await fetchArchivedPageData(original, endtimestamp).then(() =>
-        window.alert("Data cloned successfully!")
+      await fetchArchivedPageData(original, endtimestamp, isCreatePost).then(
+        () => window.alert("Data cloned successfully!")
       );
     } catch (error) {
       console.error("Error cloning data:", error);
@@ -76,9 +80,21 @@ export function WebArchiveTable({
                         <TableCell>
                           <button
                             className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                            onClick={() => handleCloneData(entry[0], entry[3])}
+                            onClick={() =>
+                              handleCloneData(entry[0], entry[3], true)
+                            }
                           >
-                            Clone data
+                            Crawl and create Post
+                          </button>
+                        </TableCell>
+                        <TableCell>
+                          <button
+                            className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                            onClick={() =>
+                              handleCloneData(entry[0], entry[3], false)
+                            }
+                          >
+                            Crawl and create Page
                           </button>
                         </TableCell>
                       </TableRow>

@@ -1,11 +1,19 @@
 import axios from "axios";
 
 // Tạo bài viết mới
-export async function createPost(title: string, htmlContent: string) {
+export async function createWordpress(
+  title: string,
+  htmlContent: string,
+  isCreatePost: boolean
+) {
   const loginUrl =
     "https://crawl-demo.k-tech-services.com/wp-json/jwt-auth/v1/token";
-  const postEndPoint =
+  const pageEndPoint =
     "https://crawl-demo.k-tech-services.com/wp-json/wp/v2/pages";
+  const postEndPoint =
+    "https://crawl-demo.k-tech-services.com/wp-json/wp/v2/posts";
+
+  const endpoint = isCreatePost ? postEndPoint : pageEndPoint;
 
   const loginResponse = await axios.post(loginUrl, {
     username: "admin",
@@ -17,14 +25,14 @@ export async function createPost(title: string, htmlContent: string) {
 
   try {
     await axios.post(
-      postEndPoint,
+      endpoint,
       {
         title: {
           rendered: title,
           raw: title,
         },
         content: htmlContent,
-        // status: "publish", // 'draft' nếu chưa muốn công khai
+        status: "publish", // 'draft' nếu chưa muốn công khai
       },
       {
         headers: {

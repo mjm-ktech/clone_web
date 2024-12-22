@@ -6,7 +6,7 @@ import {
   fetchWebArchiveData,
   WebArchiveData,
 } from "@/utils/fetchWebArchieveData";
-import { createPost } from "@/app/actions/wpapi";
+import { createWordpress } from "@/app/actions/wpapi";
 
 export async function fetchWebArchiveAction(
   formData: FormData
@@ -23,7 +23,8 @@ export async function fetchWebArchiveAction(
 
 export async function fetchArchivedPageData(
   origin: string,
-  endtimestamp: string
+  endtimestamp: string,
+  isCreatePost: boolean
 ): Promise<string> {
   try {
     // Construct the archive URL dynamically
@@ -51,12 +52,12 @@ export async function fetchArchivedPageData(
 
     console.log("Extracted content:", wrapperContent);
 
-    const slug: string  = origin.split('/').filter(Boolean).pop() ?? "";
+    const slug: string = origin.split("/").filter(Boolean).pop() ?? "";
 
     // Replace hyphens (-) with spaces
     const formattedText = slug.replace(/-/g, " ");
     // Optionally post to WordPress
-    await createPost(formattedText, wrapperContent);
+    await createWordpress(formattedText, wrapperContent, isCreatePost);
 
     return wrapperContent;
   } catch (error) {
