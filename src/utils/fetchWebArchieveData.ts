@@ -23,20 +23,10 @@ export async function fetchWebArchiveData(
 export function groupDataByYear(data: WebArchiveData): GroupedWebArchiveData {
   const [headers, ...entries] = data;
   const endTimestampIndex = headers.indexOf("endtimestamp");
-  const originalIndex = headers.indexOf("original");
 
-  // Regular expression to match URLs with date paths
-  const datePathRegex = /\/\d{4}\/\d{2}\/\d{2}\//;
-
-  // Filter entries that match the date path pattern in the "original" column
-  const filteredEntries = entries.filter((entry) =>
-    datePathRegex.test(entry[originalIndex])
-  );
-
-  // Group filtered entries by year
-  return filteredEntries.reduce((acc: GroupedWebArchiveData, entry) => {
+  return entries.reduce((acc: GroupedWebArchiveData, entry) => {
     const year = entry[endTimestampIndex].substring(0, 4);
-
+    
     if (!acc[year]) {
       acc[year] = [];
     }
