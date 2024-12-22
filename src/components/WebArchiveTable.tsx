@@ -37,8 +37,9 @@ export function WebArchiveTable({
     setIsModalOpen(true); // Open the modal
     try {
       // Simulate an API call
-      await fetchArchivedPageData(original, endtimestamp);
-      alert("Data cloned successfully!");
+      await fetchArchivedPageData(original, endtimestamp).then(() =>
+        window.alert("Data cloned successfully!")
+      );
     } catch (error) {
       console.error("Error cloning data:", error);
       alert("Failed to clone data. Please try again.");

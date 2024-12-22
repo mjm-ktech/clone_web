@@ -5,7 +5,7 @@ import { fetchWebArchiveAction } from "./actions/fetchWebArchieveAction";
 import {
   WebArchiveData,
   GroupedWebArchiveData,
-  groupDataByYear
+  groupDataByYear,
 } from "@/utils/fetchWebArchieveData";
 import { WebArchiveTable } from "@/components/WebArchiveTable";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ export default function Home() {
     rawData: WebArchiveData;
     groupedData: GroupedWebArchiveData;
   } | null>(null);
-  const [url, setUrl] = useState("https://sonatural.vn/");
+  const [url, setUrl] = useState("https://kulimamalawi.org/");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,12 +27,12 @@ export default function Home() {
 
     try {
       const formData = new FormData(e.currentTarget);
-      
+
       const data = await fetchWebArchiveAction(formData);
       console.log(data);
       setWebArchiveData({
         rawData: data,
-        groupedData: await groupDataByYear(data)
+        groupedData: await groupDataByYear(data),
       });
     } catch (err) {
       console.error("Error fetching Web Archive data:", err);
