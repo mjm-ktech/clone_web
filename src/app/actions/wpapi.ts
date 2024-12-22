@@ -4,7 +4,8 @@ import axios from "axios";
 export async function createWordpress(
   title: string,
   htmlContent: string,
-  isCreatePost: boolean
+  isCreatePost: boolean,
+  categories?: string[]
 ) {
   const loginUrl =
     "https://crawl-demo.k-tech-services.com/wp-json/jwt-auth/v1/token";
@@ -12,6 +13,8 @@ export async function createWordpress(
     "https://crawl-demo.k-tech-services.com/wp-json/wp/v2/pages";
   const postEndPoint =
     "https://crawl-demo.k-tech-services.com/wp-json/wp/v2/posts";
+  const categoryEndPoint =
+    "https://crawl-demo.k-tech-services.com/wp-json/wp/v2/categories";
 
   const endpoint = isCreatePost ? postEndPoint : pageEndPoint;
 
@@ -23,6 +26,45 @@ export async function createWordpress(
   const token = loginResponse.data.token;
   console.log("Token nhận được:", token);
 
+  const categoryIds: number[] = [];
+  if (categories) {
+    for (const categoryName of categories) {
+      try {
+        // Kiểm tra xem category đã tồn tại chưa
+        const existingCategory = await axios.get(categoryEndPoint, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            search: categoryName,
+          },
+        });
+
+        if (existingCategory.data.length > 0) {
+          // Danh mục đã tồn tại, thêm ID vào danh sách
+          categoryIds.push(existingCategory.data[0].id);
+        } else {
+          // Danh mục chưa tồn tại, tạo mới
+          const newCategory = await axios.post(
+            categoryEndPoint,
+            { name: categoryName },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          categoryIds.push(newCategory.data.id);
+        }
+      } catch (error) {
+        console.error(`Lỗi xử lý danh mục "${categoryName}":`, error);
+      }
+    }
+  }
+
+  console.log("Category IDs:", categoryIds);
+
   try {
     await axios.post(
       endpoint,
@@ -33,6 +75,7 @@ export async function createWordpress(
         },
         content: htmlContent,
         status: "publish", // 'draft' nếu chưa muốn công khai
+        categories: categoryIds,
       },
       {
         headers: {

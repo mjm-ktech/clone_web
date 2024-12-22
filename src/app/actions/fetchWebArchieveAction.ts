@@ -50,14 +50,30 @@ export async function fetchArchivedPageData(
       throw new Error("No content found with ID 'wrapper'.");
     }
 
-    console.log("Extracted content:", wrapperContent);
+    // console.log("Extracted content:", wrapperContent);
+
+    // Extract category information from the class "entry-category"
+    const categoryElements = $(".entry-category");
+    const categories: string[] = [];
+
+    categoryElements.each((_, element) => {
+      const category = $(element).text().trim();
+      if (category) {
+        categories.push(category);
+      }
+    });
 
     const slug: string = origin.split("/").filter(Boolean).pop() ?? "";
 
     // Replace hyphens (-) with spaces
     const formattedText = slug.replace(/-/g, " ");
     // Optionally post to WordPress
-    await createWordpress(formattedText, wrapperContent, isCreatePost);
+    await createWordpress(
+      formattedText,
+      wrapperContent,
+      isCreatePost,
+      categories
+    );
 
     return wrapperContent;
   } catch (error) {
