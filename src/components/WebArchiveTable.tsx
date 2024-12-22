@@ -42,6 +42,23 @@ export function WebArchiveTable({
     isCreatePost: boolean
   ) {
     setIsModalOpen(true); // Open the modal
+
+    if (!wpUrl) {
+      toast.error("Vui lòng nhập URL trên trang web");
+      setIsModalOpen(false);
+      return;
+    }
+
+    // Kiểm tra cấu trúc URL
+    const wpUrlPattern = /^https?:\/\/[^/]+\/wp-json$/;
+    if (!wpUrlPattern.test(wpUrl)) {
+      toast.error(
+        "URL không hợp lệ. Vui lòng nhập URL có dạng https://your-url.com/wp-json"
+      );
+      setIsModalOpen(false);
+      return;
+    }
+
     // Simulate an API call
     await fetchArchivedPageData(original, endtimestamp, isCreatePost, wpUrl)
       .then(() => toast.success("Data cloned successfully!"))
