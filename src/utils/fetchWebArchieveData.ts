@@ -22,11 +22,27 @@ export async function fetchWebArchiveData(
 
 export function groupDataByYear(data: WebArchiveData): GroupedWebArchiveData {
   const [headers, ...entries] = data;
+
+  // Xác định cột "endtimestamp" và "original"
   const endTimestampIndex = headers.indexOf("endtimestamp");
+  const originalIndex = headers.indexOf("original");
+
+  if (endTimestampIndex === -1 || originalIndex === -1) {
+    throw new Error(
+      "Required columns 'endtimestamp' or 'original' are missing."
+    );
+  }
 
   return entries.reduce((acc: GroupedWebArchiveData, entry) => {
+    // Bỏ qua các mục có URL chứa '/wp-content'
+    if (entry[originalIndex].includes("/wp")) {
+      return acc;
+    }
+
+    // Lấy năm từ cột 'endtimestamp'
     const year = entry[endTimestampIndex].substring(0, 4);
-    
+
+    // Nhóm theo năm
     if (!acc[year]) {
       acc[year] = [];
     }
