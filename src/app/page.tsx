@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import { useWpStore } from "@/store/wp";
 import { groupDataByYear } from "@/utils/groupDataByYear";
+import { FaExternalLinkAlt } from "react-icons/fa";
 // import Link from "next/link";
 
 export default function Home() {
@@ -85,11 +86,7 @@ export default function Home() {
     <main className="min-h-screen bg-background p-4">
       {/* <div className="flex items-center justify-between"> */}
       <h1 className="text-3xl font-bold mb-4">Web Archive Data Fetcher</h1>
-      {/* <Link
-          href={"/guide"}
-          className="text-blue-500 font-bold"
-          target="_blank"
-        >
+      {/* <Link href={"/guide"} className="text-blue-500 font-bold" target="_blank">
           Hướng dẫn sử dụng
         </Link> */}
       {/* </div> */}
@@ -110,14 +107,15 @@ export default function Home() {
       </form>
       <div className="flex items-center gap-[20px]">
         <label htmlFor="url">Config URL trang wordpress:</label>
-        <p className="text-red-500 text-[20px]">
+        <p className="text-red-500 text-[20px] flex items-center gap-[5px]">
           Vui lòng cài đặt extension{" "}
           <b>
             <a
               href="https://vi.wordpress.org/plugins/jwt-authentication-for-wp-rest-api/"
               target="_blank"
+              className="flex items-center gap-[5px] hover:underline"
             >
-              JWT Authentication for WP REST API{" "}
+              JWT Authentication for WP REST API <FaExternalLinkAlt size={14} />
             </a>
           </b>
           trước khi sử dụng.
