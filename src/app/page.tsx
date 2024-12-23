@@ -142,7 +142,7 @@ export default function Home() {
           name="wpUrl"
           defaultValue={wpdata.wpUrl}
           // onChange={(e) => setWpUrl(e.target.value)}
-          placeholder="Enter wordpress URL (e.g., https://crawl-wordpress-url.com/wp-json)"
+          placeholder="Enter wordpress URL (e.g., https://crawl-wordpress-url.com)"
           required
           className="flex-grow"
           disabled={!isEditWpUrl}
