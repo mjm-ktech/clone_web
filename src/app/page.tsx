@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import { useWpStore } from "@/store/wp";
 import { groupDataByYear } from "@/utils/groupDataByYear";
+// import Link from "next/link";
 
 export default function Home() {
   const [webArchiveData, setWebArchiveData] = useState<{
@@ -82,7 +83,16 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background p-4">
+      {/* <div className="flex items-center justify-between"> */}
       <h1 className="text-3xl font-bold mb-4">Web Archive Data Fetcher</h1>
+      {/* <Link
+          href={"/guide"}
+          className="text-blue-500 font-bold"
+          target="_blank"
+        >
+          Hướng dẫn sử dụng
+        </Link> */}
+      {/* </div> */}
       <label htmlFor="url">URL trang web cần fetch:</label>
       <form onSubmit={handleSubmit} className="mb-4 flex gap-2">
         <Input
@@ -98,7 +108,22 @@ export default function Home() {
           {isLoading ? "Fetching..." : "Fetch"}
         </Button>
       </form>
-      <label htmlFor="url">Config URL trang wordpress:</label>
+      <div className="flex items-center gap-[20px]">
+        <label htmlFor="url">Config URL trang wordpress:</label>
+        <p className="text-red-500 text-[20px]">
+          Vui lòng cài đặt extension{" "}
+          <b>
+            <a
+              href="https://vi.wordpress.org/plugins/jwt-authentication-for-wp-rest-api/"
+              target="_blank"
+            >
+              JWT Authentication for WP REST API{" "}
+            </a>
+          </b>
+          trước khi sử dụng.
+        </p>
+      </div>
+
       <form onSubmit={handleSaveWpUrl} className="mb-4 flex flex-col gap-2">
         <Input
           type="wpUrl"
