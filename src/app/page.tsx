@@ -40,7 +40,7 @@ export default function Home() {
       console.log(data);
       setWebArchiveData({
         rawData: data,
-        groupedData: await groupDataByYear(data),
+        groupedData: groupDataByYear(data),
       });
     } catch (err) {
       console.error("Error fetching Web Archive data:", err);
@@ -149,9 +149,6 @@ export default function Home() {
         </Button>
       </form>
 
-      <Button type="submit" onClick={() => console.log(wpdata)}>
-        Save
-      </Button>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {webArchiveData && (
         <WebArchiveTable

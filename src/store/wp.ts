@@ -8,9 +8,9 @@ type WpStore = {
 };
 
 export const useWpStore = create<WpStore>((set) => ({
-  wpUrl: "https://crawl-demo.k-tech-services.com",
-  username: "admin",
-  password: "@ktech@1903",
+  wpUrl: "",
+  username: "",
+  password: "",
   updateWpInfo: (wpUrl: string, username: string, password: string) =>
     set(() => ({
       wpUrl: wpUrl,
