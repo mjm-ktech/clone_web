@@ -1,3 +1,4 @@
+import { convertTitleToSlug } from "@/utils/convertTitleToSlug";
 import axios from "axios";
 
 // Tạo bài viết mới
@@ -5,32 +6,38 @@ export async function createWordpress(
   title: string,
   htmlContent: string,
   isCreatePost: boolean,
-  wpUrl: string,
+  wpInfo: { wpUrl: string; username: string; password: string },
   categories?: string[]
 ) {
+  const { wpUrl, username: wpUsername, password: wpPassword } = wpInfo;
+
   if (!wpUrl) {
     throw new Error("Vui lòng nhập URL trên trang web");
   }
 
   // Kiểm tra cấu trúc URL
-  const wpUrlPattern = /^https?:\/\/[^/]+\/wp-json$/;
+  const wpUrlPattern = /^https?:\/\/[^/]+\/?$/;
   if (!wpUrlPattern.test(wpUrl)) {
     throw new Error(
-      "URL không hợp lệ. Vui lòng nhập URL có dạng https://your-url.com/wp-json"
+      "URL không hợp lệ. Vui lòng nhập URL có dạng https://your-url.com"
     );
   }
 
-  const loginUrl = `${wpUrl}/jwt-auth/v1/token`;
-  const pageEndPoint = `${wpUrl}/wp/v2/pages`;
-  const postEndPoint = `${wpUrl}/wp/v2/posts`;
-  const categoryEndPoint = `${wpUrl}/wp/v2/categories`;
+  const loginUrl = `${wpUrl}/wp-json/jwt-auth/v1/token`;
+  const pageEndPoint = `${wpUrl}/wp-json/wp/v2/pages`;
+  const postEndPoint = `${wpUrl}/wp-json/wp/v2/posts`;
+  const categoryEndPoint = `${wpUrl}/wp-json/wp/v2/categories`;
 
   const endpoint = isCreatePost ? postEndPoint : pageEndPoint;
 
-  const loginResponse = await axios.post(loginUrl, {
-    username: "admin",
-    password: "@ktech@1903",
-  });
+  const loginResponse = await axios
+    .post(loginUrl, {
+      username: wpUsername,
+      password: wpPassword,
+    })
+    .catch(() => {
+      throw new Error(`Login failed`);
+    });
 
   const token = loginResponse.data.token;
   console.log("Token nhận được:", token);
@@ -86,6 +93,7 @@ export async function createWordpress(
         content: htmlContent,
         status: "publish", // 'draft' nếu chưa muốn công khai
         categories: categoryIds,
+        slug: convertTitleToSlug(title),
       },
       {
         headers: {

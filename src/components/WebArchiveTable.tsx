@@ -20,21 +20,28 @@ import {
 } from "@/components/ui/accordion";
 import { fetchArchivedPageData } from "@/app/actions/fetchWebArchieveAction";
 import toast from "react-hot-toast";
+import { useWpStore } from "@/store/wp";
 
 interface WebArchiveTableProps {
   rawData: WebArchiveData;
   groupedData: GroupedWebArchiveData;
-  wpUrl: string;
 }
 
 export function WebArchiveTable({
   rawData,
   groupedData,
-  wpUrl,
 }: WebArchiveTableProps) {
   const [isModalOpen, setIsModalOpen] = useState(false); // Controls the modal visibility
   const [headers] = rawData;
   const years = Object.keys(groupedData).sort().reverse();
+
+  const { wpUrl, username, password } = useWpStore();
+
+  const wpInfo = {
+    wpUrl,
+    username,
+    password,
+  };
 
   async function handleCloneData(
     original: string,
@@ -50,19 +57,22 @@ export function WebArchiveTable({
     }
 
     // Kiểm tra cấu trúc URL
-    const wpUrlPattern = /^https?:\/\/[^/]+\/wp-json$/;
+    const wpUrlPattern = /^https?:\/\/[^/]+\/?$/;
     if (!wpUrlPattern.test(wpUrl)) {
       toast.error(
-        "URL không hợp lệ. Vui lòng nhập URL có dạng https://your-url.com/wp-json"
+        "URL không hợp lệ. Vui lòng nhập URL có dạng https://your-url.com"
       );
       setIsModalOpen(false);
       return;
     }
 
     // Simulate an API call
-    await fetchArchivedPageData(original, endtimestamp, isCreatePost, wpUrl)
+    await fetchArchivedPageData(original, endtimestamp, isCreatePost, wpInfo)
       .then(() => toast.success("Data cloned successfully!"))
-      .catch((e) => toast.error(e))
+      .catch((e) => {
+        console.log("🚀 ~ file: WebArchiveTable.tsx:73 ~ e:", e);
+        toast.error(e.message);
+      })
       .finally(() => setIsModalOpen(false));
   }
 

@@ -5,12 +5,13 @@ import { fetchWebArchiveAction } from "./actions/fetchWebArchieveAction";
 import {
   WebArchiveData,
   GroupedWebArchiveData,
-  groupDataByYear,
 } from "@/utils/fetchWebArchieveData";
 import { WebArchiveTable } from "@/components/WebArchiveTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
+import { useWpStore } from "@/store/wp";
+import { groupDataByYear } from "@/utils/groupDataByYear";
 
 export default function Home() {
   const [webArchiveData, setWebArchiveData] = useState<{
@@ -21,8 +22,11 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [wpUrl, setWpUrl] = useState("");
   const [isEditWpUrl, setIsEditWpUrl] = useState(false);
+
+  const updateWpInfo = useWpStore((state) => state.updateWpInfo);
+
+  const wpdata = useWpStore((state) => state);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -52,31 +56,26 @@ export default function Home() {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-    const wpUrl = formData.get("wpUrl") as string;
+    let wpUrl = formData.get("wpUrl") as string;
+    const username = formData.get("username") as string;
+    const password = formData.get("password") as string;
 
-    if (!wpUrl) {
-      console.log(
-        "🚀 ~ file: page.tsx:61 ~ handleSaveWpUrl ~ Vui lòng nhập URL trên trang web:'",
-        "Vui lòng nhập URL trên trang web"
-      );
-      toast.error("Vui lòng nhập URL trên trang web");
+    if (!wpUrl || !username || !password) {
+      toast.error("Vui lòng nhập đầy đủ thông tin trang wordpress");
       return;
     }
 
     // Kiểm tra cấu trúc URL
-    const wpUrlPattern = /^https?:\/\/[^/]+\/wp-json$/;
+    const wpUrlPattern = /^https?:\/\/[^/]+\/?$/;
     if (!wpUrlPattern.test(wpUrl)) {
-      console.log(
-        "🚀 ~ file: page.tsx:66 ~ handleSaveWpUrl ~ !wpUrlPattern.test(wpUrl):",
-        !wpUrlPattern.test(wpUrl)
-      );
       toast.error(
-        "URL không hợp lệ. Vui lòng nhập URL có dạng https://your-url.com/wp-json"
+        "URL không hợp lệ. Vui lòng nhập URL có dạng https://your-url.com"
       );
       return;
     }
+    wpUrl = wpUrl.replace(/\/$/, "");
 
-    setWpUrl(wpUrl);
+    updateWpInfo(wpUrl, username, password);
 
     setIsEditWpUrl(false);
   };
@@ -84,6 +83,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background p-4">
       <h1 className="text-3xl font-bold mb-4">Web Archive Data Fetcher</h1>
+      <label htmlFor="url">URL trang web cần fetch:</label>
       <form onSubmit={handleSubmit} className="mb-4 flex gap-2">
         <Input
           type="url"
@@ -98,13 +98,36 @@ export default function Home() {
           {isLoading ? "Fetching..." : "Fetch"}
         </Button>
       </form>
-      <form onSubmit={handleSaveWpUrl} className="mb-4 flex gap-2">
+      <label htmlFor="url">Config URL trang wordpress:</label>
+      <form onSubmit={handleSaveWpUrl} className="mb-4 flex flex-col gap-2">
         <Input
           type="wpUrl"
           name="wpUrl"
-          // value={wpUrl}
+          defaultValue={wpdata.wpUrl}
           // onChange={(e) => setWpUrl(e.target.value)}
           placeholder="Enter wordpress URL (e.g., https://crawl-wordpress-url.com/wp-json)"
+          required
+          className="flex-grow"
+          disabled={!isEditWpUrl}
+        />
+        <Input
+          type="username"
+          name="username"
+          defaultValue={wpdata.username}
+          // value={wpUrl}
+          // onChange={(e) => setWpUrl(e.target.value)}
+          placeholder="Enter wordpress username"
+          required
+          className="flex-grow"
+          disabled={!isEditWpUrl}
+        />
+        <Input
+          type="password"
+          name="password"
+          defaultValue={wpdata.password}
+          // value={wpUrl}
+          // onChange={(e) => setWpUrl(e.target.value)}
+          placeholder="Enter wordpress password"
           required
           className="flex-grow"
           disabled={!isEditWpUrl}
@@ -113,7 +136,7 @@ export default function Home() {
           onClick={() => setIsEditWpUrl(true)}
           className={`${
             isEditWpUrl && "hidden"
-          } h-[2.5rem] px-[10px] bg-black text-white cursor-pointer rounded-sm leading-[2.5rem]`}
+          } h-[2.5rem] px-[10px] bg-black text-white cursor-pointer rounded-sm leading-[2.5rem] text-center`}
         >
           Edit
         </div>
@@ -125,12 +148,15 @@ export default function Home() {
           Save
         </Button>
       </form>
+
+      <Button type="submit" onClick={() => console.log(wpdata)}>
+        Save
+      </Button>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {webArchiveData && (
         <WebArchiveTable
           rawData={webArchiveData.rawData}
           groupedData={webArchiveData.groupedData}
-          wpUrl={wpUrl}
         />
       )}
     </main>
