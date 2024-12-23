@@ -82,7 +82,18 @@ export function WebArchiveTable({
         {years.map((year) => (
           <AccordionItem key={year} value={year}>
             <AccordionTrigger className="text-xl font-semibold">
-              {year} ({groupedData[year].length} entries)
+              {year} (
+              {
+                groupedData[year].filter(
+                  (entry) =>
+                    entry[1] === "text/html" &&
+                    !/\.well-known/.test(entry[0]) &&
+                    !/\.(txt|json|css|png|jpg|jpeg|gif|svg|xml|pdf|js|webp|php4|php5|php|woff2|ico)(\?.*)?$/.test(
+                      entry[0]
+                    )
+                ).length
+              }{" "}
+              entries)
             </AccordionTrigger>
             <AccordionContent>
               <div className="overflow-x-auto">
@@ -96,33 +107,42 @@ export function WebArchiveTable({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {groupedData[year].map((entry, rowIndex) => (
-                      <TableRow key={rowIndex}>
-                        {entry.map((cell, cellIndex) => (
-                          <TableCell key={cellIndex}>{cell}</TableCell>
-                        ))}
-                        <TableCell>
-                          <button
-                            className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                            onClick={() =>
-                              handleCloneData(entry[0], entry[3], true)
-                            }
-                          >
-                            Crawl and create Post
-                          </button>
-                        </TableCell>
-                        <TableCell>
-                          <button
-                            className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                            onClick={() =>
-                              handleCloneData(entry[0], entry[3], false)
-                            }
-                          >
-                            Crawl and create Page
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {groupedData[year].map((entry, rowIndex) => {
+                      if (
+                        entry[1] === "text/html" &&
+                        !/\.well-known/.test(entry[0]) &&
+                        !/\.(txt|json|css|png|jpg|jpeg|gif|svg|xml|pdf|js|webp|php4|php5|php|woff2|ico)(\?.*)?$/.test(
+                          entry[0]
+                        )
+                      )
+                        return (
+                          <TableRow key={rowIndex}>
+                            {entry.map((cell, cellIndex) => (
+                              <TableCell key={cellIndex}>{cell}</TableCell>
+                            ))}
+                            <TableCell>
+                              <button
+                                className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                onClick={() =>
+                                  handleCloneData(entry[0], entry[3], true)
+                                }
+                              >
+                                Crawl and create Post
+                              </button>
+                            </TableCell>
+                            <TableCell>
+                              <button
+                                className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                onClick={() =>
+                                  handleCloneData(entry[0], entry[3], false)
+                                }
+                              >
+                                Crawl and create Page
+                              </button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                    })}
                   </TableBody>
                 </Table>
               </div>

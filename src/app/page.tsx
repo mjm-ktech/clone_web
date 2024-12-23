@@ -14,6 +14,7 @@ import { useWpStore } from "@/store/wp";
 import { groupDataByYear } from "@/utils/groupDataByYear";
 import { FaExternalLinkAlt } from "react-icons/fa";
 // import Link from "next/link";
+import { hasSubdomain } from "@/utils/hasSubdomain";
 
 export default function Home() {
   const [webArchiveData, setWebArchiveData] = useState<{
@@ -39,7 +40,16 @@ export default function Home() {
       const formData = new FormData(e.currentTarget);
 
       const data = await fetchWebArchiveAction(formData);
-      console.log(data);
+
+      const url = formData.get("url") as string;
+
+      if (hasSubdomain(url)) {
+        toast.error(
+          "Vui lòng nhập URL không có subdomain (chỉ bao gồm tên miền chính, ví dụ: example.com)."
+        );
+        return;
+      }
+
       setWebArchiveData({
         rawData: data,
         groupedData: groupDataByYear(data),
@@ -86,7 +96,11 @@ export default function Home() {
     <main className="min-h-screen bg-background p-4">
       {/* <div className="flex items-center justify-between"> */}
       <h1 className="text-3xl font-bold mb-4">Web Archive Data Fetcher</h1>
-      {/* <Link href={"/guide"} className="text-blue-500 font-bold" target="_blank">
+      {/* <Link
+          href={"/guide"}
+          className="text-blue-500 font-bold"
+          target="_blank"
+        >
           Hướng dẫn sử dụng
         </Link> */}
       {/* </div> */}
