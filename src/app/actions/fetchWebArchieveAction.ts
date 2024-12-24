@@ -44,10 +44,16 @@ export const fetchArchivedPageData = async (
   const $ = load(htmlContent);
 
   // Select the content inside the element with ID "wrapper"
-  const wrapperContent = $("#wrapper").html();
+  const wrapperContent = isCreatePost
+    ? $(".entry-content").html()
+    : $(".page-inner").html();
 
   if (!wrapperContent) {
-    throw new Error("No content found with ID 'wrapper'.");
+    if (isCreatePost) {
+      throw new Error("No content found with ID 'entry-content'.");
+    } else {
+      throw new Error("No content found with ID 'page-inner'.");
+    }
   }
 
   // console.log("Extracted content:", wrapperContent);

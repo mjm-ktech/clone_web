@@ -124,7 +124,7 @@ export function WebArchiveTable({
                               <button
                                 className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                 onClick={() =>
-                                  handleCloneData(entry[0], entry[3], true)
+                                  handleCloneData(entry[0], entry[2], true)
                                 }
                               >
                                 Crawl and create Post
@@ -134,7 +134,7 @@ export function WebArchiveTable({
                               <button
                                 className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                 onClick={() =>
-                                  handleCloneData(entry[0], entry[3], false)
+                                  handleCloneData(entry[0], entry[2], false)
                                 }
                               >
                                 Crawl and create Page
