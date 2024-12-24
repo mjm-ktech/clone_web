@@ -21,6 +21,7 @@ import {
 import { fetchArchivedPageData } from "@/app/actions/fetchWebArchieveAction";
 import toast from "react-hot-toast";
 import { useWpStore } from "@/store/wp";
+import { fetchArchivedPageCateData } from "@/app/actions/fetchArchivedPageCateData";
 
 interface WebArchiveTableProps {
   rawData: WebArchiveData;
@@ -67,13 +68,57 @@ export function WebArchiveTable({
     }
 
     // Simulate an API call
-    await fetchArchivedPageData(original, endtimestamp, isCreatePost, wpInfo)
-      .then(() => toast.success("Data cloned successfully!"))
-      .catch((e) => {
-        console.log("🚀 ~ file: WebArchiveTable.tsx:73 ~ e:", e);
-        toast.error(e.message);
-      })
-      .finally(() => setIsModalOpen(false));
+    try {
+      await fetchArchivedPageData(original, endtimestamp, isCreatePost, wpInfo);
+      toast.success("Data cloned successfully!");
+    } catch (error) {
+      console.error("Error in handleCloneData:", error);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unexpected error occurred. Please try again later.");
+      }
+    } finally {
+      setIsModalOpen(false);
+    }
+  }
+
+  async function handleFetchCategory(
+    original: string,
+    endtimestamp: string,
+  ) {
+    setIsModalOpen(true); // Open the modal
+
+    if (!wpUrl) {
+      toast.error("Vui lòng nhập URL trên trang web");
+      setIsModalOpen(false);
+      return;
+    }
+
+    // Kiểm tra cấu trúc URL
+    const wpUrlPattern = /^https?:\/\/[^/]+\/?$/;
+    if (!wpUrlPattern.test(wpUrl)) {
+      toast.error(
+        "URL không hợp lệ. Vui lòng nhập URL có dạng https://your-url.com"
+      );
+      setIsModalOpen(false);
+      return;
+    }
+
+    // Simulate an API call
+    try {
+      await fetchArchivedPageCateData(original, endtimestamp, wpInfo);
+      toast.success("Data cloned successfully!");
+    } catch (error) {
+      console.error("Error in handleCloneData:", error);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unexpected error occurred. Please try again later.");
+      }
+    } finally {
+      setIsModalOpen(false);
+    }
   }
 
   return (
@@ -138,6 +183,16 @@ export function WebArchiveTable({
                                 }
                               >
                                 Crawl and create Page
+                              </button>
+                            </TableCell>
+                            <TableCell>
+                              <button
+                                className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                onClick={() =>
+                                  handleFetchCategory(entry[0], entry[2])
+                                }
+                              >
+                                Create category
                               </button>
                             </TableCell>
                           </TableRow>
